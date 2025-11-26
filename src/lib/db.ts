@@ -1,24 +1,43 @@
 import { Pool } from 'pg';
-import * as dotenv from 'dotenv';
+import { environments, Environment } from '../config';
 
-dotenv.config({ path: '.env.local' });
+let pool: Pool | null = null;
 
-export const pool = new Pool({
-  host: process.env.DATABASE_HOST,
-  port: parseInt(process.env.DATABASE_PORT || '5432'),
-  database: process.env.DATABASE_NAME,
-  user: process.env.DATABASE_USER,
-  password: process.env.DATABASE_PASSWORD,
-  ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: false } : false,
-});
+export function createConnection(env: Environment, password: string): Pool {
+  const config = environments[env];
+  
+  pool = new Pool({
+    host: config.host,
+    port: config.port,
+    database: config.database,
+    user: config.user,
+    password: password,
+    ssl: { rejectUnauthorized: false },
+  });
+
+  return pool;
+}
+
+export function getPool(): Pool {
+  if (!pool) {
+    throw new Error('Database not connected. Call createConnection first.');
+  }
+  return pool;
+}
 
 export async function query(text: string, params?: any[]) {
-  const client = await pool.connect();
+  const p = getPool();
+  const client = await p.connect();
   try {
-    const result = await client.query(text, params);
-    return result;
+    return await client.query(text, params);
   } finally {
     client.release();
   }
 }
 
+export async function closeConnection() {
+  if (pool) {
+    await pool.end();
+    pool = null;
+  }
+}

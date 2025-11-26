@@ -10,9 +10,11 @@
     "db:migrate": "tsx src/scripts/migrate.ts"
   },
   "dependencies": {
+    "chalk": "^5.6.2",
     "dotenv": "^17.2.3",
     "next": "16.0.4",
     "pg": "^8.16.3",
+    "prompts": "^2.4.2",
     "react": "19.2.0",
     "react-dom": "19.2.0"
   },
@@ -20,6 +22,7 @@
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.15.6",
+    "@types/prompts": "^2.4.9",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
